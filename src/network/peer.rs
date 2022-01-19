@@ -232,7 +232,7 @@ impl<N: Network, E: Environment> Peer<N, E> {
                             return Err(anyhow!("Already connected to a peer with nonce {}", peer_nonce));
                         }
                         // Verify the listener port.
-                        if peer_ip.port() != listener_port {
+                        if E::NODE_TYPE != NodeType::Operator && peer_ip.port() != listener_port {
                             // Update the peer IP to the listener port.
                             peer_ip.set_port(listener_port);
                             // Ensure the claimed listener port is open.
