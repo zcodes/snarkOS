@@ -157,9 +157,9 @@ impl<N: Network, E: Environment> Server<N, E> {
         // Initialize a new instance of the heartbeat.
         Self::initialize_heartbeat(peers.router(), ledger.reader(), ledger.router(), operator.router(), prover.router()).await;
         // Initialize a new instance of the RPC server.
-        Self::initialize_rpc(node, address, &peers, ledger.reader(), prover.router(), prover.memory_pool()).await;
+        // Self::initialize_rpc(node, address, &peers, ledger.reader(), prover.router(), prover.memory_pool()).await;
         // Initialize a new instance of the notification.
-        Self::initialize_notification(ledger.reader(), prover.clone(), address).await;
+        //Self::initialize_notification(ledger.reader(), prover.clone(), address).await;
 
         // Initialise the metrics exporter.
         #[cfg(feature = "prometheus")]
@@ -308,9 +308,7 @@ impl<N: Network, E: Environment> Server<N, E> {
                     error!("Failed to send heartbeat to ledger: {}", error)
                 }
                 // Transmit a heartbeat request to the peers.
-                let request = PeersRequest::Heartbeat(
-                    ledger_reader.clone(),
-                    ledger_router.clone(),
+                let request = PeersRequest::HeartbeatWithoutLedger(
                     operator_router.clone(),
                     prover_router.clone(),
                 );

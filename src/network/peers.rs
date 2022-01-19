@@ -57,6 +57,7 @@ pub enum PeersRequest<N: Network, E: Environment> {
     ),
     /// Heartbeat := (ledger_reader, ledger_router, operator_router, prover_router)
     Heartbeat(LedgerReader<N>, LedgerRouter<N>, OperatorRouter<N>, ProverRouter<N>),
+    HeartbeatWithoutLedger(OperatorRouter<N>, ProverRouter<N>),
     /// MessagePropagate := (peer_ip, message)
     MessagePropagate(SocketAddr, Message<N, E>),
     /// MessageSend := (peer_ip, message)

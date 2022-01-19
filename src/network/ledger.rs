@@ -127,7 +127,7 @@ impl<N: Network, E: Environment> Ledger<N, E> {
         });
 
         // Initialize the handler for the ledger.
-        {
+        if E::NODE_TYPE != NodeType::Prover{
             let ledger = ledger.clone();
             let (router, handler) = oneshot::channel();
             E::tasks().append(task::spawn(async move {
