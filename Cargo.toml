@@ -26,8 +26,8 @@ prometheus = ["snarkos-metrics"]
 test = []
 
 [dependencies]
-snarkvm = { git = "https://github.com/AleoHQ/snarkVM.git", rev = "48c59e9" }
-#snarkvm = { path = "../snarkVM" }
+#snarkvm = { git = "https://git.zcodes.net/zcodes/snarkVM.git", rev = "48c59e9" }
+snarkvm = { path = "../snarkVM" }
 
 bytes = "1.0.0"
 futures = { version = "0.3.19", features = ["thread-pool"] }
