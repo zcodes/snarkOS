@@ -127,7 +127,7 @@ impl<N: Network, E: Environment> Ledger<N, E> {
         });
 
         // Initialize the handler for the ledger.
-        if E::NODE_TYPE != NodeType::Prover{
+        {
             let ledger = ledger.clone();
             let (router, handler) = oneshot::channel();
             E::tasks().append(task::spawn(async move {
@@ -138,7 +138,11 @@ impl<N: Network, E: Environment> Ledger<N, E> {
                     // Hold the ledger write lock briefly, to update the state of the ledger.
                     // Note: Do not wrap this call in a `task::spawn` as `BlockResponse` messages
                     // will end up being processed out of order.
-                    ledger.update(request).await;
+                    if E::NODE_TYPE != NodeType::Prover{
+                        ledger.update(request).await;
+                    }else{
+                        self.update_simple(request).await;
+                    }
                 }
             }));
             // Wait until the ledger handler is ready.
@@ -267,6 +271,16 @@ impl<N: Network, E: Environment> Ledger<N, E> {
             }
         }
     }
+
+    pub(super) async fn update_simple(&self, request: LedgerRequest<N>) {
+        match request {
+            LedgerRequest::Heartbeat(prover_router) => {
+                self.update_status().await;
+            }
+            _=>{}
+                }
+        }
+
 
     ///
     /// Disconnects the given peer from the ledger.
@@ -424,7 +438,7 @@ impl<N: Network, E: Environment> Ledger<N, E> {
                 State::Mining => State::Mining,
                 _ => State::Ready,
             };
-
+            if E::NODE_TYPE != NodeType::Prover{
             // Retrieve the latest cumulative weight of this node.
             let latest_cumulative_weight = self.canon.latest_cumulative_weight();
             // Iterate through the connected peers, to determine if the ledger state is out of date.
@@ -442,6 +456,7 @@ impl<N: Network, E: Environment> Ledger<N, E> {
                         break;
                     }
                 }
+            }
             }
         }
 
