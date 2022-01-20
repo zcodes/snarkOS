@@ -14,7 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with the snarkOS library. If not, see <https://www.gnu.org/licenses/>.
 
-use crate::{Data, Environment, LedgerReader, LedgerRouter, Message, OperatorRouter, OutboundRouter, Peer, ProverRouter};
+use crate::{Data, Environment, LedgerReader, LedgerRouter, Message, OperatorRouter, OutboundRouter, Peer, ProverRouter,
+    helpers::{NodeType, State},
+};
 use snarkvm::dpc::prelude::*;
 
 use anyhow::Result;
@@ -368,7 +370,7 @@ impl<N: Network, E: Environment> Peers<N, E> {
                     }
                     false => return,
                 };
-
+                if E::NODE_TYPE != NodeType::Prover{
                 // Add the sync nodes to the list of candidate peers.
                 if number_of_connected_sync_nodes == 0 {
                     self.add_candidate_peers(E::sync_nodes().iter()).await;
@@ -414,6 +416,7 @@ impl<N: Network, E: Environment> Peers<N, E> {
                         }));
                     }
                 }
+            }
             }
             PeersRequest::MessagePropagate(sender, message) => {
                 self.propagate(sender, message).await;
