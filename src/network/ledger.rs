@@ -275,6 +275,7 @@ impl<N: Network, E: Environment> Ledger<N, E> {
     pub(super) async fn update_simple(&self, request: LedgerRequest<N>) {
         match request {
             LedgerRequest::Heartbeat(prover_router) => {
+                info!("Ledger>>> {}", E::status());
                 self.update_status().await;
             }
             _=>{}
@@ -419,6 +420,7 @@ impl<N: Network, E: Environment> Ledger<N, E> {
     async fn update_status(&self) {
         // Retrieve the status variable.
         let mut status = E::status().get();
+        info!("Leger>>>> {}", status);
 
         // If the node is shutting down, skip the update.
         if status == State::ShuttingDown {
@@ -469,6 +471,7 @@ impl<N: Network, E: Environment> Ledger<N, E> {
             E::terminator().store(false, Ordering::SeqCst);
         }
 
+        info!("Leger>>>> {}", status);
         // Update the ledger to the determined status.
         E::status().update(status);
     }

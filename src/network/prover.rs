@@ -135,18 +135,22 @@ impl<N: Network, E: Environment> Prover<N, E> {
 
         // Initialize the prover, if the node type is a prover.
         if E::NODE_TYPE == NodeType::Prover && prover.pool.is_some() {
+            // info!("Prover: >>>>");
+            E::status().update(State::Ready);
             let prover = prover.clone();
             let (router, handler) = oneshot::channel();
             task::spawn(async move {
                 // Notify the outer function that the task is ready.
                 let _ = router.send(());
                 loop {
+                    // info!("Loop >>> {}", E::status());
                     // Sleep for `1` second.
                     tokio::time::sleep(std::time::Duration::from_secs(1)).await;
 
                     // TODO (howardwu): Check that the prover is connected to the pool before proceeding.
                     //  Currently we use a sleep function to probabilistically ensure the peer is connected.
                     if !E::terminator().load(Ordering::SeqCst) && !E::status().is_peering() && !E::status().is_mining() {
+                        // info!("Loop >>><<<< {}", E::status());
                         prover.send_pool_register().await;
                     }
                 }
@@ -182,6 +186,7 @@ impl<N: Network, E: Environment> Prover<N, E> {
         match request {
             ProverRequest::PoolRequest(operator_ip, share_difficulty, block_template) => {
                 // Process the pool request message.
+                // info!("Prover>>> {} {} {}", operator_ip, share_difficulty, block_template);
                 self.process_pool_request(operator_ip, share_difficulty, block_template).await;
             }
             ProverRequest::MemoryPoolClear(block) => match block {
@@ -236,6 +241,7 @@ impl<N: Network, E: Environment> Prover<N, E> {
 
                             let block_height = block_template.block_height();
                             let block_template = block_template.clone();
+                            let aa = block_template.clone();
 
                             let result = task::spawn_blocking(move || {
                                 E::thread_pool().install(move || {
@@ -265,6 +271,8 @@ impl<N: Network, E: Environment> Prover<N, E> {
 
                             match result {
                                 Ok(Ok((nonce, proof, proof_difficulty))) => {
+                                    info!("{}", aa);
+                                    info!(">>><<<< {} nonce", nonce);
                                     info!(
                                         "Prover successfully mined a share for unconfirmed block {} with proof difficulty of {}",
                                         block_height, proof_difficulty

@@ -233,6 +233,7 @@ impl<N: Network, E: Environment> Operator<N, E> {
     pub(super) async fn update(&self, request: OperatorRequest<N>) {
         match request {
             OperatorRequest::PoolRegister(peer_ip, address) => {
+                info!("Operator>>> {} {} {}", peer_ip, address, E::status());
                 if let Some(block_template) = self.block_template.read().await.clone() {
                     // Ensure this prover exists in the list first, and retrieve their share difficulty.
                     let share_difficulty = self
@@ -253,6 +254,7 @@ impl<N: Network, E: Environment> Operator<N, E> {
                 }
             }
             OperatorRequest::PoolResponse(peer_ip, prover, nonce, proof) => {
+                info!("Operator>>> {} {} {} {} {}", peer_ip, prover, nonce, proof, E::status());
                 if let Some(block_template) = self.block_template.read().await.clone() {
                     // Ensure the given nonce from the prover is new.
                     if self.known_nonces.read().await.contains(&nonce) {
