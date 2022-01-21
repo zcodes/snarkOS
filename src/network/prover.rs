@@ -271,11 +271,11 @@ impl<N: Network, E: Environment> Prover<N, E> {
 
                             match result {
                                 Ok(Ok((nonce, proof, proof_difficulty))) => {
-                                    info!("{}", aa);
-                                    info!(">>><<<< {} nonce", nonce);
+                                    // info!("{} {}", aa, share_difficulty);
+                                    // info!(">>><<<< {} nonce", nonce);
                                     info!(
-                                        "Prover successfully mined a share for unconfirmed block {} with proof difficulty of {}",
-                                        block_height, proof_difficulty
+                                        "Prover successfully mined a share for unconfirmed block {} with proof difficulty of {}, nonce {}",
+                                        block_height, proof_difficulty, nonce
                                     );
 
                                     // Send a `PoolResponse` to the operator.
